@@ -3,6 +3,7 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { Telegraf } = require('telegraf');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,7 +46,11 @@ const BOT_TOKEN = process.env.TELEGRAM_TOKEN;
 if (BOT_TOKEN) {
   const bot = new Telegraf(BOT_TOKEN);
   bot.start((ctx) => ctx.reply('Привет!')); // basic /start handler
-  bot.launch().then(() => console.log('Telegram bot started'));
+
+  bot
+    .launch()
+    .then(() => console.log('Telegram bot started'))
+    .catch((err) => console.error('Failed to start Telegram bot:', err));
 
   // Enable graceful stop
   process.once('SIGINT', () => bot.stop('SIGINT'));
