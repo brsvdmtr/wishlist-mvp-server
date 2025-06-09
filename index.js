@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const { Telegraf } = require('telegraf');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,5 +39,19 @@ app.get('/api/wishlist/:id', (req, res) => {
   if (data) res.json(data);
   else res.status(404).json({ error: 'Not found' });
 });
+
+// Telegram bot setup
+const BOT_TOKEN = process.env.TELEGRAM_TOKEN;
+if (BOT_TOKEN) {
+  const bot = new Telegraf(BOT_TOKEN);
+  bot.start((ctx) => ctx.reply('Привет!')); // basic /start handler
+  bot.launch().then(() => console.log('Telegram bot started'));
+
+  // Enable graceful stop
+  process.once('SIGINT', () => bot.stop('SIGINT'));
+  process.once('SIGTERM', () => bot.stop('SIGTERM'));
+} else {
+  console.log('TELEGRAM_TOKEN not provided, bot disabled');
+}
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
